@@ -1,0 +1,10 @@
+Blender addon, process a VSE image strip
+========================================
+gabriel montagné <g@tibas.london>
+0.0.1,
+
+This addon enables a 'Process Clip' operator and panel that works on image strips from the VSE.
+It will import the module from the name provided in the dialog and will pass each of the images as numpy arrays to a `process_frame` method on it.
+It expects, as return value, another numpy array for which this addon will create a new file that will be attached to a new strip with the processed files.
+
+This addon uses scipy and numpy, etc. and your scripts modules, whatever they use, must be visible from Blender.
