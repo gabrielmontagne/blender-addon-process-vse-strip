@@ -10,6 +10,12 @@ import bpy
 import importlib
 import numpy as np
 
+bl_info = {
+    'name': "Process VSE strip",
+    'category': 'Development',
+    'author': "Gabriel Montagné Láscaris-Comneno"
+}
+
 loaded_modules = {}
 
 
