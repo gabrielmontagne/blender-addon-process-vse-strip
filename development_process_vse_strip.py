@@ -78,8 +78,6 @@ class SequencerProcessClip(Operator):
 
         window_manager.progress_begin(0, len(elements_to_process))
 
-        print('Module_name', self.module_name, self.reload_if_loaded)
-
         module_name = self.module_name
 
         if module_name in loaded_modules and self.reload_if_loaded:
@@ -92,20 +90,26 @@ class SequencerProcessClip(Operator):
         for i, element in enumerate(elements_to_process):
 
             window_manager.progress_update(i)
+rint('acá')
+
             orig = misc.imread(join(target_path, element.filename))
             original_file_name = display_name_from_filepath(element.filename)
             process_name = original_file_name + '_hcy'
+
             processed = module.process_frame(
                 orig, frame_final_start + i, process_name)
 
             new_file_name = process_name + '.png'
             process_full_path = path.join(processed_dir, new_file_name)
+
             misc.imsave(process_full_path, processed)
+            print('saved image', process_full_path)
 
             if i == 0:
-                print('Filepath', process_full_path)
+                new_sequence_name = active_strip.name + ' (hcy)'
+                print('Creating new image sequence "{}"', new_sequence_name)
                 new_sequence = sequence_editor.sequences.new_image(
-                    name=active_strip.name + ' (hcy)',
+                    name=new_sequence_name,
                     filepath=relpath(process_full_path),
                     frame_start=frame_final_start,
                     channel=active_strip.channel + 1)
