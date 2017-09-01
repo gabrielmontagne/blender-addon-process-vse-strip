@@ -90,7 +90,6 @@ class SequencerProcessClip(Operator):
         for i, element in enumerate(elements_to_process):
 
             window_manager.progress_update(i)
-rint('acá')
 
             orig = misc.imread(join(target_path, element.filename))
             original_file_name = display_name_from_filepath(element.filename)
@@ -107,7 +106,7 @@ rint('acá')
 
             if i == 0:
                 new_sequence_name = active_strip.name + ' (hcy)'
-                print('Creating new image sequence "{}"', new_sequence_name)
+                print('Creating new image sequence "{}"'.format(new_sequence_name))
                 new_sequence = sequence_editor.sequences.new_image(
                     name=new_sequence_name,
                     filepath=relpath(process_full_path),
