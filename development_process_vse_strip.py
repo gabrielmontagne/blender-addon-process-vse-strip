@@ -4,7 +4,7 @@ from bpy.types import Operator, Panel, ImageSequence
 from bpy_extras.io_utils import path_reference
 from os import path, makedirs
 from os.path import join
-from scipy import misc
+import imageio
 from time import sleep
 import bpy
 import importlib
@@ -30,7 +30,8 @@ class SEQUENCER_PT_process_clip(Panel):
 
     @classmethod
     def poll(self, context):
-        return is_valid(context.scene.sequence_editor.active_strip)
+
+        return context.scene.sequence_editor and is_valid(context.scene.sequence_editor.active_strip)
 
     def draw(self, context):
         layout = self.layout
@@ -45,7 +46,7 @@ class SequencerProcessClip(Operator):
     bl_label = "Process strip"
 
     module_name = bpy.props.StringProperty(
-        default='roperot', description='Module with the process_frame method')
+        default='miura.baire', description='Module with the process_frame method')
     reload_if_loaded = bpy.props.BoolProperty(
         default=True, description='Reload module if already loaded')
 
@@ -58,6 +59,9 @@ class SequencerProcessClip(Operator):
         return wm.invoke_props_dialog(self)
 
     def execute(self, context):
+
+        print('execute miura')
+
         scene = context.scene
         sequence_editor = scene.sequence_editor
 
@@ -65,6 +69,7 @@ class SequencerProcessClip(Operator):
         target_path = abspath(active_strip.directory)
         processed_dir = join(target_path, clean_name(active_strip.name))
         window_manager = context.window_manager
+
 
         makedirs(processed_dir, exist_ok=True)
 
@@ -87,26 +92,52 @@ class SequencerProcessClip(Operator):
 
         loaded_modules[module_name] = module
 
+        use_multiview = active_strip.use_multiview
+
+        if use_multiview:
+            print('stereo strip\n', active_strip, dir(active_strip))
+            print(active_strip)
+            print('—' * 10)
+            print(dir(active_strip))
+            print(active_strip.views_format)
+            print(active_strip.stereo_3d_format)
+            print(active_strip.stereo_3d_format.display_mode)
+            print('^' * 10)
+
+            assert active_strip.views_format == 'STEREO_3D', 'Only STEREO_3D views formatsupported'
+            assert active_strip.stereo_3d_format.display_mode == 'TOPBOTTOM', 'Only TOPBOTTOM display mode supported'
+
         for i, element in enumerate(elements_to_process):
 
             window_manager.progress_update(i)
-rint('acá')
 
-            orig = misc.imread(join(target_path, element.filename))
+            image_path = join(target_path, element.filename)
+
+            print('image_path', image_path)
+
+            orig = imageio.imread(image_path)
             original_file_name = display_name_from_filepath(element.filename)
-            process_name = original_file_name + '_hcy'
+            process_name = 'hcy_' + original_file_name 
+
+            print('--- cer cebprff', orig, orig.shape)
 
             processed = module.process_frame(
-                orig, frame_final_start + i, process_name)
+                orig, frame_final_start + i, process_name, 
+                is_topbottom=use_multiview)
+
+            print('--- cbfg cebprff')
 
             new_file_name = process_name + '.png'
             process_full_path = path.join(processed_dir, new_file_name)
 
-            misc.imsave(process_full_path, processed)
+            print('path to save', process_full_path)
+
+            imageio.imsave(process_full_path, processed)
+
             print('saved image', process_full_path)
 
             if i == 0:
-                new_sequence_name = active_strip.name + ' (hcy)'
+                new_sequence_name = active_strip.name + '_processed.000'
                 print('Creating new image sequence "{}"', new_sequence_name)
                 new_sequence = sequence_editor.sequences.new_image(
                     name=new_sequence_name,
@@ -116,7 +147,12 @@ rint('acá')
             else:
                 new_sequence.elements.append(new_file_name)
 
-            new_sequence.blend_type = 'ALPHA_OVER'
+        if use_multiview:
+            new_sequence.use_multiview = use_multiview
+            new_sequence.views_format = 'STEREO_3D'
+            new_sequence.stereo_3d_format.display_mode = 'TOPBOTTOM'
+
+        new_sequence.blend_type = 'ALPHA_OVER'
 
         window_manager.progress_end()
         print('Done!')
