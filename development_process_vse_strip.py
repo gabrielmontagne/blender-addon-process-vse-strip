@@ -13,15 +13,14 @@ import numpy as np
 bl_info = {
     'name': "Process VSE strip",
     'category': 'Development',
-    'author': "Gabriel Montagné Láscaris-Comneno"
+    'author': "Gabriel Montagné Láscaris-Comneno",
+    'blender': (2, 80, 0)
 }
 
 loaded_modules = {}
 
-
 def is_valid(active_strip):
     return active_strip is not None and isinstance(active_strip, ImageSequence)
-
 
 class SEQUENCER_PT_process_clip(Panel):
     bl_label = "Process Clip"
@@ -30,7 +29,6 @@ class SEQUENCER_PT_process_clip(Panel):
 
     @classmethod
     def poll(self, context):
-
         return context.scene.sequence_editor and is_valid(context.scene.sequence_editor.active_strip)
 
     def draw(self, context):
@@ -40,13 +38,12 @@ class SEQUENCER_PT_process_clip(Panel):
         row.label(text='OK')
         row.operator('sequencer.process_strip')
 
-
-class SequencerProcessClip(Operator):
+class SEQUENCER_OP_process_clip(Operator):
     bl_idname = 'sequencer.process_strip'
     bl_label = "Process strip"
 
     module_name = bpy.props.StringProperty(
-        default='miura.baire', description='Module with the process_frame method')
+        default='potrero.raire', description='Module with the process_frame method')
     reload_if_loaded = bpy.props.BoolProperty(
         default=True, description='Reload module if already loaded')
 
@@ -60,7 +57,7 @@ class SequencerProcessClip(Operator):
 
     def execute(self, context):
 
-        print('execute miura')
+        print('execute module')
 
         scene = context.scene
         sequence_editor = scene.sequence_editor
@@ -99,9 +96,9 @@ class SequencerProcessClip(Operator):
             print(active_strip)
             print('—' * 10)
             print(dir(active_strip))
-            print(active_strip.views_format)
-            print(active_strip.stereo_3d_format)
-            print(active_strip.stereo_3d_format.display_mode)
+            print('views format', active_strip.views_format)
+            print('stereo 3d format', active_strip.stereo_3d_format)
+            print('display mode', active_strip.stereo_3d_format.display_mode)
             print('^' * 10)
 
             assert active_strip.views_format == 'STEREO_3D', 'Only STEREO_3D views formatsupported'
@@ -112,25 +109,17 @@ class SequencerProcessClip(Operator):
             window_manager.progress_update(i)
 
             image_path = join(target_path, element.filename)
-
-            print('image_path', image_path)
-
             orig = imageio.imread(image_path)
+
             original_file_name = display_name_from_filepath(element.filename)
             process_name = 'hcy_' + original_file_name 
-
-            print('--- cer cebprff', orig, orig.shape)
 
             processed = module.process_frame(
                 orig, frame_final_start + i, process_name, 
                 is_topbottom=use_multiview)
 
-            print('--- cbfg cebprff')
-
             new_file_name = process_name + '.png'
             process_full_path = path.join(processed_dir, new_file_name)
-
-            print('path to save', process_full_path)
 
             imageio.imsave(process_full_path, processed)
 
@@ -138,7 +127,7 @@ class SequencerProcessClip(Operator):
 
             if i == 0:
                 new_sequence_name = active_strip.name + '_processed.000'
-                print('Creating new image sequence "{}"', new_sequence_name)
+                print('Creating new image sequence "{}"'.format(new_sequence_name))
                 new_sequence = sequence_editor.sequences.new_image(
                     name=new_sequence_name,
                     filepath=relpath(process_full_path),
@@ -162,13 +151,13 @@ class SequencerProcessClip(Operator):
 
 def register():
     print('Register Process strip')
-    bpy.utils.register_class(SequencerProcessClip)
+    bpy.utils.register_class(SEQUENCER_OP_process_clip)
     bpy.utils.register_class(SEQUENCER_PT_process_clip)
 
 
 def unregister():
     print('Unregister Process strip')
-    bpy.utils.unregister_class(SequencerProcessClip)
+    bpy.utils.unregister_class(SEQUENCER_OP_process_clip)
     bpy.utils.unregister_class(SEQUENCER_PT_process_clip)
 
 
