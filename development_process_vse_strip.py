@@ -4,7 +4,6 @@ from bpy.types import Operator, Panel, ImageSequence
 from bpy_extras.io_utils import path_reference
 from os import path, makedirs
 from os.path import join
-import imageio
 from time import sleep
 import bpy
 import importlib
@@ -18,6 +17,31 @@ bl_info = {
 }
 
 loaded_modules = {}
+
+def label(pixels, text, pos=(10, 25), colour=(255, 255, 255)):
+    import cv2
+    FONT = cv2.FONT_HERSHEY_SIMPLEX
+    cv2.putText(pixels, text, pos, FONT, 1, colour, 1, cv2.LINE_8)
+
+def split_topbottom(orig):
+    return np.split(orig, 2)
+
+def join_topbottom(a, b):
+    return np.concatenate((a, b))
+
+def prop(name, frame_number, default):
+    world = bpy.context.scene.world
+
+    fcurve = None
+    if world.animation_data:
+        fcurve = world.animation_data.action.fcurves.find('["{}"]'.format(name))
+
+    if fcurve:
+        result = fcurve.evaluate(frame_number)
+    else:
+        result = world.get(name, default)
+
+    return result
 
 def is_valid(active_strip):
     return active_strip is not None and isinstance(active_strip, ImageSequence)
@@ -40,7 +64,7 @@ class SEQUENCER_PT_process_clip(Panel):
 
 class SEQUENCER_OP_process_clip(Operator):
     bl_idname = 'sequencer.process_strip'
-    bl_label = "Process strip"
+    bl_label = "Process Strip"
 
     module_name = bpy.props.StringProperty(
         default='potrero.raire', description='Module with the process_frame method')
@@ -57,7 +81,7 @@ class SEQUENCER_OP_process_clip(Operator):
 
     def execute(self, context):
 
-        print('execute module')
+        import imageio
 
         scene = context.scene
         sequence_editor = scene.sequence_editor
@@ -66,7 +90,6 @@ class SEQUENCER_OP_process_clip(Operator):
         target_path = abspath(active_strip.directory)
         processed_dir = join(target_path, clean_name(active_strip.name))
         window_manager = context.window_manager
-
 
         makedirs(processed_dir, exist_ok=True)
 
@@ -112,10 +135,10 @@ class SEQUENCER_OP_process_clip(Operator):
             orig = imageio.imread(image_path)
 
             original_file_name = display_name_from_filepath(element.filename)
-            process_name = 'hcy_' + original_file_name 
+            process_name = 'hcy_' + original_file_name
 
             processed = module.process_frame(
-                orig, frame_final_start + i, process_name, 
+                orig, frame_final_start + i, process_name,
                 is_topbottom=use_multiview)
 
             new_file_name = process_name + '.png'
@@ -148,18 +171,13 @@ class SEQUENCER_OP_process_clip(Operator):
 
         return {'FINISHED'}
 
-
 def register():
-    print('Register Process strip')
     bpy.utils.register_class(SEQUENCER_OP_process_clip)
     bpy.utils.register_class(SEQUENCER_PT_process_clip)
 
-
 def unregister():
-    print('Unregister Process strip')
     bpy.utils.unregister_class(SEQUENCER_OP_process_clip)
     bpy.utils.unregister_class(SEQUENCER_PT_process_clip)
-
 
 if __name__ == '__main__':
     register()
