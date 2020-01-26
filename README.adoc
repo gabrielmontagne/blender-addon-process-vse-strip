@@ -7,4 +7,29 @@ This addon enables a 'Process Clip' operator and panel that works on image strip
 It will import the module from the name provided in the dialog and will pass each of the images as numpy arrays to a `process_frame` method on it.
 It expects, as return value, another numpy array for which this addon will create a new file that will be attached to a new strip with the processed files.
 
+* `def process_frame(orig, frame_number, process_name, is_topbottom=False):`
+
+… where `process_name` is the name of the clip, and `is_topbottom` is `True` for stereoscopic  top/bottom images (the only supported stereoscopy format ATM)
+
 This addon uses scipy and numpy, etc. and your scripts modules, whatever they use, must be visible from Blender.
+
+
+There are a few helper functions you can import from your modules.
+
+`>>> from development_process_vse_strip import label, split_topbottom, join_topbottom,  prop`
+
+With the following signatures, 
+
+* `def split_topbottom(orig):` and `def join_topbottom(a, b):`
+  For stereoscopic top/bottom arrays.  
+  When you receive an array for a top/bottom image, you can get the top and bottom components from this method,
+  `top, bottom = split_topbottom(orig)`.
+  Once you process them, you can join them again for their return, `return join_topbottom(top, bottom)`
+
+* `def label(pixels, text, pos=(10, 25), colour=(255, 255, 255)):`
+  This prints a label with text `text` onto `pixels`.
+
+* `def prop(name, frame_number, default):`
+  This helper function evaluates an f-curve or value for a custom property set on the world.
+  This is useful for using f-curves to drive some of your frame processing operations.
+  This method will handle missing properties, etc. by accepting a default.
