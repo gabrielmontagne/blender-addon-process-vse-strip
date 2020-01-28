@@ -66,10 +66,14 @@ class SEQUENCER_OP_process_clip(Operator):
     bl_idname = 'sequencer.process_strip'
     bl_label = "Process Strip"
 
-    module_name = bpy.props.StringProperty(
+    module_name: bpy.props.StringProperty(
         default='potrero.raire', description='Module with the process_frame method')
-    reload_if_loaded = bpy.props.BoolProperty(
+
+    reload_if_loaded: bpy.props.BoolProperty(
         default=True, description='Reload module if already loaded')
+
+    process_offline: bpy.props.BoolProperty(
+        default=False, description='Process offline')
 
     @classmethod
     def poll(self, context):
@@ -115,15 +119,6 @@ class SEQUENCER_OP_process_clip(Operator):
         use_multiview = active_strip.use_multiview
 
         if use_multiview:
-            print('stereo strip\n', active_strip, dir(active_strip))
-            print(active_strip)
-            print('—' * 10)
-            print(dir(active_strip))
-            print('views format', active_strip.views_format)
-            print('stereo 3d format', active_strip.stereo_3d_format)
-            print('display mode', active_strip.stereo_3d_format.display_mode)
-            print('^' * 10)
-
             assert active_strip.views_format == 'STEREO_3D', 'Only STEREO_3D views formatsupported'
             assert active_strip.stereo_3d_format.display_mode == 'TOPBOTTOM', 'Only TOPBOTTOM display mode supported'
 
@@ -132,21 +127,30 @@ class SEQUENCER_OP_process_clip(Operator):
             window_manager.progress_update(i)
 
             image_path = join(target_path, element.filename)
-            orig = imageio.imread(image_path)
-
             original_file_name = display_name_from_filepath(element.filename)
             process_name = 'hcy_' + original_file_name
 
-            processed = module.process_frame(
-                orig, frame_final_start + i, process_name,
-                is_topbottom=use_multiview)
-
             new_file_name = process_name + '.png'
             process_full_path = path.join(processed_dir, new_file_name)
+            frame_number = frame_final_start + i
 
-            imageio.imsave(process_full_path, processed)
+            if self.process_offline:
+                print('process offline')
+                module.process_frame_offline(
+                    image_path,
+                    process_full_path,
+                    frame_number,
+                    process_name,
+                    is_topbottom=use_multiview)
 
-            print('saved image', process_full_path)
+                print('frame processed', process_full_path)
+            else:
+                orig = imageio.imread(image_path)
+                processed = module.process_frame(
+                    orig, frame_number, process_name,
+                    is_topbottom=use_multiview)
+                imageio.imsave(process_full_path, processed)
+                print('saved image', process_full_path)
 
             if i == 0:
                 new_sequence_name = active_strip.name + '_processed.000'
