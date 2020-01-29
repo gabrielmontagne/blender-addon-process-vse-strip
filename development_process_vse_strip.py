@@ -2,8 +2,9 @@ from bpy import context
 from bpy.path import abspath, clean_name, display_name_from_filepath, relpath
 from bpy.types import Operator, Panel, ImageSequence
 from bpy_extras.io_utils import path_reference
-from os import path, makedirs
-from os.path import join
+from os import path, makedirs, stat
+from os.path import join, isfile
+from stat import S_ISREG
 from time import sleep
 import bpy
 import importlib
@@ -143,6 +144,7 @@ class SEQUENCER_OP_process_clip(Operator):
                     process_name,
                     is_topbottom=use_multiview)
 
+                assert isfile(process_full_path), 'image not created!'
                 print('frame processed', process_full_path)
             else:
                 orig = imageio.imread(image_path)
