@@ -3,6 +3,22 @@ Blender addon, process a VSE image strip
 gabriel montagné <g@tibas.london>
 0.0.1,
 
+Ó, 
+
+== nuevo
+
+
+
+== viejo
+
+On blender python install imageio
+Luego, para que los módulos se vean, linketearlos desde 
+/home/gabriel/blender-git/build_linux/bin/2.91/python/lib/python3.7/site-packages
+
+y también, desde ahí, 
+lrwxrwxrwx 1 gabriel gabriel 81 Sep  9 00:46 development_process_vse_strip -> /home/gabriel/.config/blender/2.91/scripts/addons/blender-addon-process-vse-strip
+
+
 This addon enables a 'Process Clip' operator and panel that works on image strips from the VSE.
 It will import the module from the name provided in the dialog and will pass each of the images as numpy arrays to a `process_frame` method on it.
 It expects, as return value, another numpy array for which this addon will create a new file that will be attached to a new strip with the processed files.
