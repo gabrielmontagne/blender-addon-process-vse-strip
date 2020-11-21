@@ -36,6 +36,9 @@ With the following signatures,
   This is useful for using f-curves to drive some of your frame processing operations.
   This method will handle missing properties, etc. by accepting a default.
 
+== Test drive
+
+Install the minimalist https://github.com/gabrielmontagne/xyy[xyy] test module.
 
 == Installation,
 

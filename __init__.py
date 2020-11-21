@@ -68,7 +68,7 @@ class SEQUENCER_OP_process_clip(Operator):
     bl_label = "Process Strip"
 
     module_name: bpy.props.StringProperty(
-        default='potrero.raire', description='Module with the process_frame method')
+        default='xyy', description='Module with the process_frame method')
 
     reload_if_loaded: bpy.props.BoolProperty(
         default=True, description='Reload module if already loaded')
