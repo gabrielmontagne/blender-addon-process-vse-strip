@@ -49,5 +49,5 @@ then install this module locally, perhaps in developer mode,
 
 ----
 /opt/blender/2.92/python/bin/python3.7m -m ensurepip
-/opt/blender/2.92/python/bin/python3.7m -m pip install imageio opencv-python=3.4.3.18
+/opt/blender/2.92/python/bin/python3.7m -m pip install imageio opencv-python==3.4.3.18
 ----
