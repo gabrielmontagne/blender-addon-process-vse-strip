@@ -1,8 +1,10 @@
+from os.path import join, isfile
+from requests import post
+
 from bpy.path import abspath, clean_name, display_name_from_filepath, relpath
 from bpy.props import IntProperty, StringProperty
 from bpy.types import Operator, Panel, ImageSequence
 from bpy.utils import register_class, unregister_class
-from os.path import join, isfile
 
 bl_info = {
     'name': "Process VSE strip",
@@ -70,12 +72,15 @@ class SEQUENCER_OP_process_clip(Operator):
 
             print(f'process {processed_dir} {image_path} for {original_file_name} {frame_number} {use_multiview}')
 
+            payload = {
+                'original_file_name': original_file_name,
+                'image_path': image_path, 
+                'processed_dir': processed_dir,
+                'frame_number': frame_number
+            }
 
-        print(
-            f""" 
-            {processed_dir}
-            """
-        )
+            r = post(f'http://0.0.0.0:{self.server_port}/process', json=payload)
+            print(r)
 
         window_manager.progress_end()
         return {'FINISHED'}
