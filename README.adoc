@@ -8,9 +8,15 @@ gabriel montagné <g@tibas.london>
 This addon enables a 'Process Clip' operator and panel that works on image strips from the VSE.
 
 It works by POSTing, for each image in the image strip,  to a locally running server, by default 0.0.0.0:3000/process a payload that has, among other things, the original_file_name.
-With this, that server (not implemented here) can open the file as a NumPy array, process it, save it to a new path, and return the path to the new filename. 
+With this, that server (not implemented here) can open the file as a NumPy array, process it, save it to a new path, and return the path to the new filename.
 
 This addon will create a new image strip from the returned processed image paths.
+
+image::before.png[Before]
+
+image::operator.png[Operator]
+
+image::after.png[After]
 
 == Animation curves
 
@@ -18,8 +24,8 @@ The addon will forward all animated custom properties on the scene that start wi
 
 == Helpers
 
-We have a couple of helper functions on https://github.com/gabrielmontagne/xyy to make this simple. 
+We have a couple of helper functions on https://github.com/gabrielmontagne/xyy to make this simple.
 
-You can find a minimalistic implementation of a module that uses these functions here:  https://github.com/gabrielmontagne/process_vse_sort. 
+You can find a minimalistic implementation of a module that uses these functions here:  https://github.com/gabrielmontagne/process_vse_sort.
 
 
