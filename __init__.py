@@ -23,7 +23,7 @@ def find_custom_curves(scene):
     if not scene.animation_data or not scene.animation_data.action:
         return None
 
-    custom_keys = [k for k in scene.keys() if k.startswith('xxy_')]
+    custom_keys = [k for k in scene.keys() if k.startswith('xyy_')]
     curve_by_key = {}
 
     for k in custom_keys:

@@ -14,7 +14,7 @@ This addon will create a new image strip from the returned processed image paths
 
 == Animation curves
 
-The addon will forward all animated custom properties on the scene that start with xxy_.  You can use these animation curves to parametrize the transformation of the frames.
+The addon will forward all animated custom properties on the scene that start with xyy_.  You can use these animation curves to parametrize the transformation of the frames.
 
 == Helpers
 
