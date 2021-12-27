@@ -19,6 +19,28 @@ bl_info = {
 def is_valid(active_strip):
     return active_strip is not None and isinstance(active_strip, ImageSequence)
 
+def find_custom_curves(scene):
+
+    if not scene.animation_data or not scene.animation_data.action :
+        return None
+
+    custom_keys = [k for k in scene.keys() if k.startswith('xxy_')]
+    curve_by_key = {}
+
+    for k in custom_keys:
+        fcurve = scene.animation_data.action.fcurves.find(f'["{k}"]')
+        if not fcurve: continue
+        curve_by_key[k] = fcurve
+
+    return curve_by_key
+
+def extract_curve_for_frame(curves, frame):
+    result = {}
+    for k in curves:
+        result[k] = curves[k].evaluate(frame)
+
+    return result
+
 
 class SEQUENCER_PT_process_clip(Panel):
     bl_label = "Process Clip"
@@ -55,15 +77,16 @@ class SEQUENCER_OP_process_clip(Operator):
         return wm.invoke_props_dialog(self)
 
     def execute(self, context):
-        print('process VSE')
-
         scene = context.scene
         sequence_editor = scene.sequence_editor
 
-        effective_strip_name = self.new_strip_name or active_strip.name
+        curve_by_key = find_custom_curves(scene)
+
 
         active_strip = sequence_editor.active_strip
         target_path = abspath(active_strip.directory)
+
+        effective_strip_name = self.new_strip_name or active_strip.name
         processed_dir = join(target_path, clean_name(effective_strip_name))
         makedirs(processed_dir, exist_ok=True)
 
@@ -100,6 +123,8 @@ class SEQUENCER_OP_process_clip(Operator):
                 'use_multiview': use_multiview,
                 'frame_number': frame_number
             }
+
+            payload.update(extract_curve_for_frame(curve_by_key, frame_number))
 
             r = post(f'http://0.0.0.0:{self.server_port}/process', json=payload)
             process_full_path = r.text
