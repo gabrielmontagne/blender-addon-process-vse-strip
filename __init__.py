@@ -7,7 +7,6 @@ from bpy.path import abspath, clean_name, display_name_from_filepath, relpath
 from bpy.props import IntProperty, StringProperty, BoolProperty
 from bpy.types import Operator, Panel, ImageSequence
 from bpy.utils import register_class, unregister_class
-from pprint import pformat
 
 bl_info = {
     'name': "Process VSE strip",
@@ -21,7 +20,7 @@ def is_valid(active_strip):
 
 def find_custom_curves(scene):
 
-    if not scene.animation_data or not scene.animation_data.action :
+    if not scene.animation_data or not scene.animation_data.action:
         return None
 
     custom_keys = [k for k in scene.keys() if k.startswith('xxy_')]
@@ -132,14 +131,12 @@ class SEQUENCER_OP_process_clip(Operator):
 
             if i == 0:
                 new_sequence_name = effective_strip_name  + '.000'
-                print('Creating new image sequence "{}"'.format(new_sequence_name))
                 new_sequence = sequence_editor.sequences.new_image(
                     name=new_sequence_name,
                     filepath=relpath(process_full_path),
                     frame_start=frame_final_start,
                     channel=active_strip.channel + 1)
             else:
-                print('append file', basename(process_full_path))
                 new_sequence.elements.append(basename(process_full_path))
 
         if use_multiview:
