@@ -24,7 +24,7 @@ The addon will forward all animated custom properties on the scene that start wi
 
 == Helpers
 
-We have a couple of helper functions on https://github.com/gabrielmontagne/xyy to make this simple.
+We have a couple of helper functions on https://github.com/gabrielmontagne/xyy to make this simple.  They include a simple server and function wrapper that will receive the request, load the file into a NumPy array and pass it to your wrapped function.  You return a modified array that will then be automatically saved and returned to this addon.
 
 You can find a minimalistic implementation of a module that uses these functions here:  https://github.com/gabrielmontagne/process_vse_sort.
 
