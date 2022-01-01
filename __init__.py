@@ -35,8 +35,10 @@ def find_custom_curves(scene):
 
 def extract_curve_for_frame(curves, frame):
     result = {}
-    for k in curves:
-        result[k] = curves[k].evaluate(frame)
+
+    if curves:
+        for k in curves:
+            result[k] = curves[k].evaluate(frame)
 
     return result
 
