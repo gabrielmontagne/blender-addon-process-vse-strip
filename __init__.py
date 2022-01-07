@@ -1,7 +1,6 @@
 from os import path, makedirs, stat
 from os.path import join, isfile, basename
 from requests import post
-from IPython import embed
 
 from bpy.path import abspath, clean_name, display_name_from_filepath, relpath
 from bpy.props import IntProperty, StringProperty, BoolProperty
