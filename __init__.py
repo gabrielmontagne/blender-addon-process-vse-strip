@@ -70,7 +70,7 @@ class SEQUENCER_OP_process_clip(Operator):
 
     @classmethod
     def poll(self, context):
-        return is_valid(context.scene.sequence_editor.active_strip)
+        return context.scene.sequence_editor and is_valid(context.scene.sequence_editor.active_strip)
 
     def invoke(self, context, event):
         wm = context.window_manager
