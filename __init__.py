@@ -82,6 +82,8 @@ class SEQUENCER_OP_process_clip(Operator):
 
         curve_by_key = find_custom_curves(scene)
 
+        print('curve_by_key', curve_by_key)
+
 
         active_strip = sequence_editor.active_strip
         target_path = abspath(active_strip.directory)
@@ -92,9 +94,11 @@ class SEQUENCER_OP_process_clip(Operator):
 
 
         elements = active_strip.elements
-        frame_offset_start = active_strip.frame_offset_start
-        frame_final_start = active_strip.frame_final_start
-        frame_final_duration = active_strip.frame_final_duration
+        print('elements', elements)
+
+        frame_offset_start = int(active_strip.frame_offset_start)
+        frame_final_start = int(active_strip.frame_final_start)
+        frame_final_duration = int(active_strip.frame_final_duration)
 
         window_manager = context.window_manager
 
